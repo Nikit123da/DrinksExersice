@@ -3,6 +3,7 @@ let drinksArr = []; //all the drinks
 let ingridientsArr = [];
 let messurmentsArr = [];
 let selectedValue = document.getElementById("select"); 
+let gallery = document.querySelector(".drinksWindow");
 
 
 (function addTitles(url = 'https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list') {
@@ -21,26 +22,14 @@ function filterDrinks(selectedValue)
 {
     drinkWindow.innerHTML = '';
     let drink = selectedValue.value;
-    let i = 1,j=1;
     fetch(('https://www.thecocktaildb.com/api/json/v1/1/search.php?s='+drink).trim())
     .then(response => response.json())
     .then(data =>
-        data.drinks.forEach(element =>
-        {   
-            if(element.strIngredient+i != null)
-            {
-                ingridientsArr.push(element.strIngredient+i);
-                i++;
-            }
+            data.drinks.forEach(element =>
+            {   
+                let card = addCard(element);
 
-            if(element.strMeasure+j != null)
-            {
-                messurmentsArr.push(element.strMeasure+j)
-                j++;
             }
-
-            putCard(ingridientsArr, messurmentsArr,element.strDrinkThumb,element.strInstructions,element.strDrink);
-        }
         )
     )
 }
@@ -54,48 +43,66 @@ function addToSearch(value)
     select.appendChild(option);
 }
 
-function putCard(ingridientsArr, messurmentsArr, imgLink, instructions, drinkName)
-{
-    let card = document.querySelectorAll(".main");
-    let drink = document.querySelector(".drinkName");
-    let image = document.querySelector(".img");
-    let instr = document.querySelector(".instructions");
-    let template  = document.getElementById("templateID");; //document.getElementById("templateID").content.querySelector();
+function addCard(drink) {
+    console.log(drink);
+    let card = document.createElement("div");
 
-    if(!template)
-        console.log("null");
+    let title = document.createElement("div");
+    let visIng = document.createElement("div");
+    let img = document.createElement("img");
+    let ingTbl = document.createElement("table");
+    let description = document.createElement("div");
 
-    let body = template.content.cloneNode(true);
+    title.innerText = drink.strDrink;
+    img.src = drink.strDrinkThumb;
+    title.classList.add("title")
+    visIng.appendChild(img);
 
-    fillTable(ingridientsArr, messurmentsArr,body);
-    card.appendChild(table);
-    instr.innerHTML = instructions;
-    image.src = imgLink;
-    drink.innerHTML = drinkName;
-    console.log(card); 
-    drinkWindow.appendChild(card);
-}
+    let tblRow = document.createElement("tr");
 
-function fillTable(ingridientsArr, messurmentsArr, tableBody)
-{
-    //creates one row at a time with the messurment and ingridient
+    let tblCol = document.createElement("th");
+    tblCol.innerText = "Ingredient";
+    tblRow.appendChild(tblCol);
 
-    let i = 0;
-    for(; i < ingridientsArr.length; i++)
-    {
-        let row = document.createElement("tr")
-        tableBody.appendChild(row);
-        let ing = document.createElement("td");
-        let mes = document.createElement("td");
-        //updates row's values
-        ing.innerHTML = ingridientsArr[i];
-        mes.innerHTML = messurmentsArr[i];
+    tblCol = document.createElement("th");
+    tblCol.innerText = "Measure";
+    tblRow.appendChild(tblCol);
 
-        bodyRow.appendChild(ing);
-        bodyRow.appendChild(mes);
+    ingTbl.appendChild(tblRow);
+
+    for (let i = 0; i < 15; i++) {
+        if (drink[`strIngredient${i + 1}`] == null) {
+            break;
+        }
+
+        tblRow = document.createElement("tr");
+
+        tblCol = document.createElement("td");
+        tblCol.innerText = drink[`strIngredient${i + 1}`]
+        tblRow.appendChild(tblCol);
+
+        tblCol = document.createElement("td");
+        tblCol.innerText = drink[`strMeasure${i + 1}`]
+        tblRow.appendChild(tblCol);
+
+        ingTbl.appendChild(tblRow);
     }
 
-    return table;
+    visIng.appendChild(ingTbl);
+    visIng.classList.add("vis_ing");
+
+    description.innerText = drink.strInstructions;
+    description.classList.add("description");
+
+    card.appendChild(title);
+    card.appendChild(visIng);
+    card.appendChild(description);
+
+    card.classList.add("main");
+
+    gallery.appendChild(card);
+
+    
 }
 
 selectedValue.addEventListener("change", function() 
