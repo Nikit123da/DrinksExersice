@@ -1,7 +1,5 @@
 let drinkWindow = document.getElementById("drinksWindow");
-let drinksArr = []; //all the drinks
-let ingridientsArr = [];
-let messurmentsArr = [];
+
 let selectedValue = document.getElementById("select"); 
 let gallery = document.querySelector(".drinksWindow");
 
@@ -11,11 +9,10 @@ let gallery = document.querySelector(".drinksWindow");
         .then(response => response.json()) 
         .then(data => {
             data.drinks.forEach(element => {
-                 // Accessing `drinks` array in the response
-                addToSearch(element.strIngredient1); // Assuming `strIngredient1` is the property for ingredient names
+                addToSearch(element.strIngredient1);
             });
         })
-        .catch(error => console.log("Error fetching data:", error)); // Added error handling
+        .catch(error => console.log("Error fetching data:", error)); 
 })();
 
 function filterDrinks(selectedValue)
@@ -27,8 +24,7 @@ function filterDrinks(selectedValue)
     .then(data =>
             data.drinks.forEach(element =>
             {   
-                let card = addCard(element);
-
+                addCard(element);
             }
         )
     )
@@ -44,31 +40,40 @@ function addToSearch(value)
 }
 
 function addCard(drink) {
-    console.log(drink);
+
     let card = document.createElement("div");
 
-    let title = document.createElement("div");
-    let visIng = document.createElement("div");
+    let header = document.createElement("div");
+    let imgTableDiv = document.createElement("div");
     let img = document.createElement("img");
-    let ingTbl = document.createElement("table");
-    let description = document.createElement("div");
+    let ingredients = document.createElement("table");
+    let instructions = document.createElement("div");
 
-    title.innerText = drink.strDrink;
+    imgTableDiv.appendChild(ingredients);
+    imgTableDiv.appendChild(img);
+    imgTableDiv.classList.add("imgTableDiv");
+
+    header.innerText = drink.strDrink;
     img.src = drink.strDrinkThumb;
-    title.classList.add("title")
-    visIng.appendChild(img);
+
+    header.classList.add("h2");
+    imgTableDiv.appendChild(img);
 
     let tblRow = document.createElement("tr");
+    tblRow.style.backgroundColor = "black";
+    tblRow.style.color = "white";
 
     let tblCol = document.createElement("th");
-    tblCol.innerText = "Ingredient";
+    tblCol.innerText = "Ingredients";
     tblRow.appendChild(tblCol);
 
     tblCol = document.createElement("th");
-    tblCol.innerText = "Measure";
+    tblCol.innerText = "Measurments";
     tblRow.appendChild(tblCol);
 
-    ingTbl.appendChild(tblRow);
+    instructions.classList.add("instructions");
+
+    ingredients.appendChild(tblRow);
 
     for (let i = 0; i < 15; i++) {
         if (drink[`strIngredient${i + 1}`] == null) {
@@ -85,31 +90,27 @@ function addCard(drink) {
         tblCol.innerText = drink[`strMeasure${i + 1}`]
         tblRow.appendChild(tblCol);
 
-        ingTbl.appendChild(tblRow);
+        ingredients.appendChild(tblRow);
     }
 
-    visIng.appendChild(ingTbl);
-    visIng.classList.add("vis_ing");
+    imgTableDiv.appendChild(ingredients);
+    imgTableDiv.classList.add("imgTableDiv");
 
-    description.innerText = drink.strInstructions;
-    description.classList.add("description");
+    instructions.innerText = drink.strInstructions;
+    instructions.classList.add("instructions");
 
-    card.appendChild(title);
-    card.appendChild(visIng);
-    card.appendChild(description);
+    card.appendChild(header);
+    card.appendChild(imgTableDiv);
+    card.appendChild(instructions);
 
-    card.classList.add("main");
+    card.classList.add("main", "img");
+    ingredients.classList.add("table","thead","th","tb")
 
     gallery.appendChild(card);
-
-    
 }
 
 selectedValue.addEventListener("change", function() 
 {
-    console.log(ingridientsArr);
-    console.log(messurmentsArr);
-    console.log('https://www.thecocktaildb.com/api/json/v1/1/search.php?s='+selectedValue.value);
     filterDrinks(selectedValue);
 });
 
